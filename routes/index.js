@@ -5,6 +5,8 @@ const eli = require('../auth/utils').eli;
 const AuthToken = require('../db/models').AuthToken;
 const uid2 = require('uid2');
 const encrypt = require('../auth/utils').encrypt;
+var display = require('../app/feeds');
+//var obj = new display();
 route.post('/signup', (req, res) => {
     User.create({
         username: req.body.username,
@@ -29,7 +31,8 @@ route.get('/logout', (req, res) => {
 });
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-    res.send(req.user);
+    res.send(display());
+      
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {
