@@ -1,11 +1,14 @@
 var FeedParser = require('feedparser');
 var request = require('request'); // feed
+var http = require('http');
+var  fs = require('fs');
+var path = require('path');
 
-
-function display()
+function display(url)
 {
-  
-  var req = request('http://feeds.bbci.co.uk/news/world/rss.xml')
+ 
+  //var req = request('http://feeds.bbci.co.uk/news/world/rss.xml')
+  var req = request(url);
   var feedparser = new FeedParser();
 
   req.on('error', done);
@@ -31,8 +34,7 @@ function display()
     var item;
     while (item = stream.read()) {
       console.log(item.title);
-      
-    }
+     }
   });
 
 

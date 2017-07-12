@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const passport = require('./auth/passport');
 
-const PORT = 1902;
+const PORT = 8080;
 const app = express();
 app.use('/', express.static(__dirname + "/static"));
 
@@ -26,3 +26,5 @@ app.use('/', require('./routes/index'));
 app.listen(PORT, function () {
     console.log("Server started on http://localhost:"+PORT);
 });
+
+module.exports = app;
