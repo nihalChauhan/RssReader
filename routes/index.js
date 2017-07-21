@@ -5,10 +5,9 @@ const eli = require('../auth/utils').eli;
 const AuthToken = require('../db/models').AuthToken;
 const uid2 = require('uid2');
 const encrypt = require('../auth/utils').encrypt;
-const display = require('../app/feeds');
 const path = require('path');
-
-
+const Request = require('request');
+const parser = require('node-feedparser');
 
 route.post('/signup', (req, res) => {
     User.create({
@@ -33,13 +32,22 @@ route.get('/logout', (req, res) => {
     })
 });
 
+
 route.get('/profile', eli('/login.html'), (req, res) => {
    res.sendFile(path.resolve('./static/feed.html'));
-      
+
 });
 
+
+
 route.post('/profile', (req, res) => {
-    res.send(display(req.body.url));
+    Request(req.body.url, (error, resp, body)=> {
+        parser(body, (error, ret) => {
+            console.log(error);
+            console.log(ret);
+            res.render('abc.hbs', {x:ret});
+        });
+    });
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {

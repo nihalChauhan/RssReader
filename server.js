@@ -8,6 +8,7 @@ const PORT = 8080;
 const app = express();
 app.use('/', express.static(__dirname + "/static"));
 
+app.set("view engine", "hbs");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
