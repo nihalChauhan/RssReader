@@ -8,6 +8,12 @@ const encrypt = require('../auth/utils').encrypt;
 const path = require('path');
 const Request = require('request');
 const parser = require('node-feedparser');
+const Feeds = require('../db/models').Feeds;
+const AddUrl = require('../routes/UserFunctions').AddUrl;
+const RemoveUrl = require('../routes/UserFunctions').RemoveUrl;
+const UpdateUrl = require('../routes/UserFunctions').UpdateUrl;
+
+var userid;
 
 route.post('/signup', (req, res) => {
     User.create({
@@ -34,20 +40,49 @@ route.get('/logout', (req, res) => {
 
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-   res.sendFile(path.resolve('./static/feed.html'));
+   userid = req.user.id; 
+   var arr_urls = [];
+   var new_array = [];
+   Feeds.findAll({ where: {userId: req.user.id} }).then(urls=>{
+        for(each in urls)
+        {
+            if(urls[each]['dataValues']['url'])
+            arr_urls.push(urls[each]['dataValues']['url']);
+        }
+    res.render('xyz.hbs', {y: arr_urls});     
+
+   });
+
 
 });
 
 
-
 route.post('/profile', (req, res) => {
-    Request(req.body.url, (error, resp, body)=> {
-        parser(body, (error, ret) => {
-            console.log(error);
-            console.log(ret);
+    console.log(userid);
+   // RemoveUrl(req.body.url, userid);
+    //AddUrl(req.body.url, userid);
+   // UpdateUrl('http://feeds.bbci.co.uk/news/world/rss.xml',userid, req.body.url);
+   //console.log(req.body.changedurl);
+   console.log()
+   if(req.body.remove)
+    {
+        RemoveUrl(req.body.urlforcrud, userid);
+        res.send("Success");   
+    }
+   if(req.body.addurl)
+   {
+        AddUrl(req.body.url, userid);
+        res.send("Success!");
+   }
+    if(req.body.display)
+    {
+        Request(req.body.urlforcrud, (error, resp, body)=> {
+            parser(body, (error, ret) => {
             res.render('abc.hbs', {x:ret});
+            });
         });
-    });
+    }
+    
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {

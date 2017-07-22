@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const passport = require('./auth/passport');
 
-const PORT = 8080;
+const PORT = 8000;
 const app = express();
 app.use('/', express.static(__dirname + "/static"));
 
