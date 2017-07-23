@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 
 const db = new Sequelize({
-    username: 'rssmanager',
-    password: 'rsspass',
+    username: 'root',
+    password: 'qaw843',
     database: 'rssproject',
     host: 'localhost',
     dialect: 'mysql',
@@ -41,14 +41,29 @@ const AuthToken = db.define('authtoken', {
     }
 });
 
+const Feeds = db.define('feeds', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    url: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
+});
+
 AuthToken.belongsTo(User);
 User.hasMany(AuthToken);
+
+Feeds.belongsTo(User);
+User.hasMany(Feeds);
 
 db.sync({force: false}).then(() => {
     console.log('Database is synchronised');
 });
 
 module.exports = {
-    User, AuthToken
+    User, AuthToken, Feeds
 };
 
