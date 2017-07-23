@@ -49,8 +49,7 @@ route.get('/profile', eli('/login.html'), (req, res) => {
             if(urls[each]['dataValues']['url'])
             arr_urls.push(urls[each]['dataValues']['url']);
         }
-    res.render('xyz.hbs', {y: arr_urls});     
-
+    res.render('xyz.hbs', {y: arr_urls});
    });
 
 
@@ -78,7 +77,24 @@ route.post('/profile', (req, res) => {
     {
         Request(req.body.urlforcrud, (error, resp, body)=> {
             parser(body, (error, ret) => {
-            res.render('abc.hbs', {x:ret});
+                for(i of ret.items){
+                    if(i.summary.search('<')==-1) {
+                        i.description = i.summary;
+                    }
+                    else {
+                        x = i.description.search('<');
+                        //i.imgUrl=i.description.substr(x);
+                        i.description = i.description.substr(0, x);
+
+                        /*
+                         x = i.imgUrl.search('src="');
+                         y = i.imgUrl.search('" he');
+                         i.imgUrl = i.imgUrl.substr(x+5, y-10);
+                         console.log(i.imgUrl);
+                         */
+                    }
+                }
+                res.render('abc.hbs', {x:ret});
             });
         });
     }
