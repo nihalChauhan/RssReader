@@ -65,9 +65,10 @@ route.post('/profile', (req, res) => {
                 parser(body, (error, ret) => {
                     AddUrl(req.body.url, userid, ret['site']['title']);
                     for(i of ret.items){
+                            if(i.summary){
                             if(i.summary.search('<')==-1) {
                                 i.description = i.summary;
-                            }
+                            }}
                             else {
                                 x = i.description.search('<');
                                 //i.imgUrl=i.description.substr(x);
