@@ -14,6 +14,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"
+    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Rss Reader">
@@ -104,6 +107,8 @@
                             <a href="{{link}}" class="mdl-button mdl-js-button mdl-js-ripple-effect" style="color:#90CAF9">
                                 READ MORE
                             </a>
+                            <input type="hidden" class="sharedlink" value="{{link}}">
+                            <button class="tweet"> Tweet </button>
 
                         </div>
                     </div>
@@ -141,5 +146,12 @@
 
 
 <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<script type="text/javascript">
+    
+    $('.tweet').click(function(){
+        window.open("https://twitter.com/intent/tweet?text=" + $(this).prev().val());
+        console.log($(this).prev().val());
+    });
+</script>
 </body>
 </html>
