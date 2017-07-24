@@ -5,7 +5,7 @@ function UrlValidity(url)
 	
 }
 
-function AddUrl(url, userid)
+function AddUrl(url, userid, title)
 {
 	Feeds.count({ where: { userId: userid, url: url } }).then(c =>{
 			//console.log("There are " + c + " urls");
@@ -14,7 +14,8 @@ function AddUrl(url, userid)
 		{
 			var entry = Feeds.build({
 				url: url,
-				userId: userid
+				userId: userid,
+				title: title
 			});
 			entry.save();
 		}

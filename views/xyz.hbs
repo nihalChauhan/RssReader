@@ -9,11 +9,11 @@
 	<input type="url" name="url" placeholder="Add URL" id="url">
 	<input type="submit" name="addurl" value="add">
 </form>
+
 {{#each y}}
 <form action="http://127.0.0.1:8000/profile" method="post">
     <h2>{{this}}</h2>
-    <input type="hidden" name="urlforcrud" value="{{this}}">
-    <input type="submit" name="update" value="update">
+    <input type="hidden" name="titleforcrud" value="{{this}}">
     <input type="submit" name="remove" value="remove">
     <input type="submit" name="display" value="display">
 </form>

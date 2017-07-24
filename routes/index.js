@@ -41,15 +41,14 @@ route.get('/logout', (req, res) => {
 
 route.get('/profile', eli('/login.html'), (req, res) => {
    userid = req.user.id; 
-   var arr_urls = [];
-   var new_array = [];
-   Feeds.findAll({ where: {userId: req.user.id} }).then(urls=>{
-        for(each in urls)
+   var arr_titles = [];
+   Feeds.findAll({ where: {userId: req.user.id} }).then(titles=>{
+        for(each in titles)
         {
-            if(urls[each]['dataValues']['url'])
-            arr_urls.push(urls[each]['dataValues']['url']);
+            
+            arr_titles.push(titles[each]['dataValues']['title']);
         }
-    res.render('xyz.hbs', {y: arr_urls});
+    res.render('xyz.hbs', {y: arr_titles});
    });
 
 
@@ -58,45 +57,79 @@ route.get('/profile', eli('/login.html'), (req, res) => {
 
 route.post('/profile', (req, res) => {
     console.log(userid);
-   // RemoveUrl(req.body.url, userid);
-    //AddUrl(req.body.url, userid);
-   // UpdateUrl('http://feeds.bbci.co.uk/news/world/rss.xml',userid, req.body.url);
-   //console.log(req.body.changedurl);
-   console.log()
-   if(req.body.remove)
-    {
-        RemoveUrl(req.body.urlforcrud, userid);
-        res.send("Success");   
-    }
+   var title = req.body.titleforcrud;
+   var url;
    if(req.body.addurl)
-   {
-        AddUrl(req.body.url, userid);
-        res.send("Success!");
-   }
-    if(req.body.display)
-    {
-        Request(req.body.urlforcrud, (error, resp, body)=> {
-            parser(body, (error, ret) => {
-                for(i of ret.items){
-                    if(i.summary.search('<')==-1) {
-                        i.description = i.summary;
-                    }
-                    else {
-                        x = i.description.search('<');
-                        //i.imgUrl=i.description.substr(x);
-                        i.description = i.description.substr(0, x);
+        {   
+            Request(req.body.url, (error, resp, body)=> {
+                parser(body, (error, ret) => {
+                    AddUrl(req.body.url, userid, ret['site']['title']);
+                    for(i of ret.items){
+                            if(i.summary.search('<')==-1) {
+                                i.description = i.summary;
+                            }
+                            else {
+                                x = i.description.search('<');
+                                //i.imgUrl=i.description.substr(x);
+                                i.description = i.description.substr(0, x);
 
-                        /*
-                         x = i.imgUrl.search('src="');
-                         y = i.imgUrl.search('" he');
-                         i.imgUrl = i.imgUrl.substr(x+5, y-10);
-                         console.log(i.imgUrl);
-                         */
+                                /*
+                                 x = i.imgUrl.search('src="');
+                                 y = i.imgUrl.search('" he');
+                                 i.imgUrl = i.imgUrl.substr(x+5, y-10);
+                                 console.log(i.imgUrl);
+                                 */
+                            }
+                        }
+                        res.render('abc.hbs', {x:ret});
+                });                
+            });    
+        }
+    else
+    {
+       Feeds.findOne({ where: {title: title, userId: userid} }).then(feeds=> {
+            url = feeds['url'];
+            if(req.body.remove)
+            {
+                RemoveUrl(url, userid);
+                var arr_titles = [];
+                Feeds.findAll({ where: {userId: req.user.id} }).then(titles=>{
+                    for(each in titles)
+                    {
+                        arr_titles.push(titles[each]['dataValues']['title']);
                     }
-                }
-                res.render('abc.hbs', {x:ret});
-            });
-        });
+                    res.render('xyz.hbs', {y: arr_titles});
+                });
+            }
+            
+            if(req.body.display)
+            {
+                Request(url, (error, resp, body)=> {
+                    parser(body, (error, ret) => {
+                        for(i of ret.items){
+                            if(i.summary.search('<')==-1) {
+                                i.description = i.summary;
+                            }
+                            else {
+                                x = i.description.search('<');
+                                //i.imgUrl=i.description.substr(x);
+                                i.description = i.description.substr(0, x);
+
+                                /*
+                                 x = i.imgUrl.search('src="');
+                                 y = i.imgUrl.search('" he');
+                                 i.imgUrl = i.imgUrl.substr(x+5, y-10);
+                                 console.log(i.imgUrl);
+                                 */
+                            }
+                        }
+                        res.render('abc.hbs', {x:ret});
+                    });
+                });
+            }
+
+       });
+   
     }
     
 });
