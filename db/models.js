@@ -28,6 +28,40 @@ const User = db.define('user', {
     password: Sequelize.STRING
 });
 
+const Groups = db.define('group', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    uid: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+    }
+});
+
+const Links = db.define('link', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    gid : {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    }
+});
+
+
 const AuthToken = db.define('authtoken', {
     id: {
         type: Sequelize.INTEGER,
@@ -68,6 +102,6 @@ db.sync({force: false}).then(() => {
 });
 
 module.exports = {
-    User, AuthToken, Feeds
+    User, AuthToken, Feeds, Groups, Links
 };
 

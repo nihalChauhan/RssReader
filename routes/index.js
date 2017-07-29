@@ -1,5 +1,7 @@
 const route = require('express').Router();
 const User = require('../db/models').User;
+const Groups = require('../db/models').Groups;
+const Links = require('../db/models').Links;
 const passport = require('../auth/passport');
 const eli = require('../auth/utils').eli;
 const AuthToken = require('../db/models').AuthToken;
@@ -40,20 +42,54 @@ route.get('/logout', (req, res) => {
 
 
 route.get('/profile', eli('/login.html'), (req, res) => {
-   userid = req.user.id; 
    var arr_titles = [];
+   var gr = [];
+
+    Groups.findAll({ where: {uid: req.user.id} }).then(groups=>{
+        for(each in groups)
+        {
+            gr.push(groups[each]['dataValues']);
+        }
    Feeds.findAll({ where: {userId: req.user.id} }).then(titles=>{
         for(each in titles)
         {
-            
             arr_titles.push(titles[each]['dataValues']['title']);
         }
-    res.render('xyz.hbs', {y: arr_titles});
+    res.render('xyz.hbs', {y: arr_titles, g: gr});
    });
-
-
+   });
 });
 
+route.post('/addg', eli('/login.html'), (req, res) => {
+    Groups.create({
+        uid: req.user.id,
+        name: req.body.groupname
+    }).then((abc) => {
+        res.redirect('/addlinks/'+abc.id)
+    })
+});
+
+route.get('/addlinks/:gid/', eli('/login.html'), (req, res) => {
+    var arr_links = [];
+    Groups.findAll({ where: {id: req.params.gid} }).then(gp => {
+        Links.findAll({where: {gid: req.params.gid}}).then(linkArr => {
+            for (each in linkArr) {
+                arr_links.push(linkArr[each]['dataValues']['email']);
+            }
+            res.render('addg.hbs', {gname: gp[0]['dataValues']['name'], links: arr_links, gid:req.params.gid});
+        });
+    });
+});
+
+route.post('/addlinks/', eli('/login.html'), (req, res) => {
+    "use strict";
+    Links.create({
+        email: req.body.email,
+        gid: req.body.gid
+    }).then((link) => {
+        res.redirect('/addlinks/'+req.body.gid+'/')
+    })
+});
 
 route.post('/profile', (req, res) => {
     console.log(userid);

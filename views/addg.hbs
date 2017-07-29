@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+<a href="http://127.0.0.1:8000/profile">Back Home</a>
+
+<h1>{{gname}}</h1>
+
+<form action="http://127.0.0.1:8000/addlinks" method="post">
+    <input type="hidden" name="gid" value="{{gid}}">
+    <input type="email" name="email" placeholder="email">
+    <input type="submit" name="Add" value="Add">
+</form>
+
+<br/>
+
+<p>Links</p>
+{{#each links}}
+    <p>{{this}}</p>
+{{/each}}
+
+</body>
+</html>
