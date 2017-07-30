@@ -13,6 +13,7 @@ const parser = require('node-feedparser');
 const Feeds = require('../db/models').Feeds;
 const AddUrl = require('../routes/UserFunctions').AddUrl;
 const RemoveUrl = require('../routes/UserFunctions').RemoveUrl;
+const im = require('../utils/share');
 const UpdateUrl = require('../routes/UserFunctions').UpdateUrl;
 
 route.post('/signup', (req, res) => {
@@ -40,6 +41,11 @@ route.get('/logout', (req, res) => {
 
 
 route.get('/profile', eli('/login.html'), (req, res) => {
+    /*
+    im.sendShare('rai.nikki17@gmail.com', 'facebook.com', function () {
+        console.log('Share done');
+    });
+    */
    var arr_titles = [];
    var gr = [];
 
@@ -118,30 +124,53 @@ route.post('/display', eli('/login.html'), (req, res)=>{
                         i.description = i.description.substr(0, x);
                         }
                     }
-                res.render('abc.hbs', {x:ret});
+                res.render('abc.hbs', {x:ret, link:feeds['id']});
             });
         });
 
     });
 });
 
+route.get('/select/:id/', eli('/login.html'), (req, res)=>{
+    "use strict";
+    var gr = [];
+    let each = {};
+
+    Groups.findAll({ where: {uid: req.user.id} }).then(groups=> {
+        for (each in groups) {
+            gr.push(groups[each]['dataValues']);
+        }
+    });
+    res.render('sel.hbs',{g:gr, i:req.params.id});
+});
+
+route.get('/share/:gid/:fid', eli('/login.html'), (req, res)=>{
+    "use strict";
+    let each = {};
+    let url = {};
+    Feeds.findOne({ where: {userId:req.user.id, id:req.params.fid } }).then(feeds=> {
+        url = feeds['url'];
+        Links.findAll({where: {gid: req.params.gid}}).then(links => {
+            if (links != {}) {
+                for (each in links) {
+                    im.sendShare(links[each]['dataValues']['email'], url, function () {
+                        console.log('Share done');
+                    });
+                }
+            }
+        });
+    });
+    res.send('success');
+});
+
+
 route.post('/addurl', eli('/login.html'), (req,res)=>{
     Request(req.body.url, (error, resp, body)=> {
         parser(body, (error, ret) => {
             AddUrl(req.body.url, req.user.id, ret['site']['title']);
-                for(i of ret.items){
-                    if(i.summary){
-                        if(i.summary.search('<')==-1) {
-                            i.description = i.summary;
-                            }}
-                            else {
-                                x = i.description.search('<');
-                                i.description = i.description.substr(0, x);
-                            }
-                        }
-            res.render('abc.hbs', {x:ret});
-        });                
-    });    
+            res.redirect('/profile');
+        });
+    });
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {
