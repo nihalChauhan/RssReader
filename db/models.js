@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 
 const db = new Sequelize({
-    username: 'rssmanager',
-    password: 'rsspass',
+    username: 'root',
+    password: 'qaw843',
     database: 'rssproject',
     host: 'localhost',
     dialect: 'mysql',

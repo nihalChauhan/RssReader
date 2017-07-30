@@ -16,7 +16,10 @@ app.use(cookieParser('secret'));
 app.use(expressSession({
     secret: 'secret',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+    	expires:false
+    }
 }));
 
 app.use(passport.initialize());

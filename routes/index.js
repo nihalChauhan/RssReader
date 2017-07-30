@@ -15,8 +15,6 @@ const AddUrl = require('../routes/UserFunctions').AddUrl;
 const RemoveUrl = require('../routes/UserFunctions').RemoveUrl;
 const UpdateUrl = require('../routes/UserFunctions').UpdateUrl;
 
-var userid;
-
 route.post('/signup', (req, res) => {
     User.create({
         username: req.body.username,
@@ -91,84 +89,59 @@ route.post('/addlinks/', eli('/login.html'), (req, res) => {
     })
 });
 
-route.post('/profile', (req, res) => {
-    console.log(userid);
+route.post('/profile', eli('/login.html'), (req, res) => {
    var title = req.body.titleforcrud;
    var url;
-   if(req.body.addurl)
-        {   
-            Request(req.body.url, (error, resp, body)=> {
-                parser(body, (error, ret) => {
-                    AddUrl(req.body.url, userid, ret['site']['title']);
-                    for(i of ret.items){
-                            if(i.summary){
-                            if(i.summary.search('<')==-1) {
-                                i.description = i.summary;
-                            }}
-                            else {
-                                x = i.description.search('<');
-                                //i.imgUrl=i.description.substr(x);
-                                i.description = i.description.substr(0, x);
-
-                                /*
-                                 x = i.imgUrl.search('src="');
-                                 y = i.imgUrl.search('" he');
-                                 i.imgUrl = i.imgUrl.substr(x+5, y-10);
-                                 console.log(i.imgUrl);
-                                 */
-                            }
-                        }
-                        res.render('abc.hbs', {x:ret});
-                });                
-            });    
-        }
-    else
-    {
-       Feeds.findOne({ where: {title: title, userId: userid} }).then(feeds=> {
+       Feeds.findOne({ where: {title: title, userId: req.user.id} }).then(feeds=> {
             url = feeds['url'];
             if(req.body.remove)
             {
-                RemoveUrl(url, userid);
-                var arr_titles = [];
-                Feeds.findAll({ where: {userId: req.user.id} }).then(titles=>{
-                    for(each in titles)
-                    {
-                        arr_titles.push(titles[each]['dataValues']['title']);
-                    }
-                    res.render('xyz.hbs', {y: arr_titles});
-                });
+                RemoveUrl(url, req.user.id);
+                res.redirect('/profile');
             }
-            
-            if(req.body.display)
-            {
-                Request(url, (error, resp, body)=> {
-                    parser(body, (error, ret) => {
-                        for(i of ret.items){
-                            if(i.summary.search('<')==-1) {
-                                i.description = i.summary;
-                            }
+       });
+    
+});
+
+route.post('/display', eli('/login.html'), (req, res)=>{
+    var title= req.body.titleforcrud;
+    Feeds.findOne({ where: {userId:req.user.id, title:title } }).then(feeds=> {
+        url = feeds['url'];
+        Request(url, (error, resp, body)=> {
+            parser(body, (error, ret) => {
+                for(i of ret.items){
+                    if(i.summary.search('<')==-1) {
+                            i.description = i.summary;
+                        }
+                    else {
+                        x = i.description.search('<');
+                        i.description = i.description.substr(0, x);
+                        }
+                    }
+                res.render('abc.hbs', {x:ret});
+            });
+        });
+
+    });
+});
+
+route.post('/addurl', eli('/login.html'), (req,res)=>{
+    Request(req.body.url, (error, resp, body)=> {
+        parser(body, (error, ret) => {
+            AddUrl(req.body.url, req.user.id, ret['site']['title']);
+                for(i of ret.items){
+                    if(i.summary){
+                        if(i.summary.search('<')==-1) {
+                            i.description = i.summary;
+                            }}
                             else {
                                 x = i.description.search('<');
-                                //i.imgUrl=i.description.substr(x);
                                 i.description = i.description.substr(0, x);
-
-                                /*
-                                 x = i.imgUrl.search('src="');
-                                 y = i.imgUrl.search('" he');
-                                 i.imgUrl = i.imgUrl.substr(x+5, y-10);
-                                 console.log(i.imgUrl);
-                                 */
                             }
                         }
-                        res.render('abc.hbs', {x:ret});
-                    });
-                });
-            }
-
-       });
-   
-    }
-    
+            res.render('abc.hbs', {x:ret});
+        });                
+    });    
 });
 
 route.post('/token', passport.authenticate('local'), (req, res) => {
