@@ -25,7 +25,6 @@ function AddUrl(url, userid, title)
 function RemoveUrl(url, userid)
 {
 	Feeds.findOne({ where: {userId: userid, url: url}}).then(data => {
-		//console.log(data);
 		data.destroy();
 	});
 }
